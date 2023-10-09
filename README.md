@@ -6,14 +6,14 @@ The Honggfuzz mutator is responsible for generating input data to feed into the 
 #### Algorithms :
 
 - mangle inc byte
-- mangle_neg_byte
-- mangle_dec_byte
-- mangle_ins_byte
-- mangle_ovw_byte
-- mangle_del_byte
-- mangle_repeat_insert
-- mangle_repeat_ovw
-- Todo (soon)
+- mangle neg byte
+- mangle dec byte
+- mangle ins byte
+- mangle ovw byte
+- mangle del byte
+- mangle repeat insert
+- mangle repeat ovw
+- Todo (Soon)
 
 
 #### Sample Output : 
