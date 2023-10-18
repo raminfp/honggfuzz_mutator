@@ -13,6 +13,7 @@ The Honggfuzz mutator is responsible for generating input data to feed into the 
 - mangle del byte
 - mangle repeat insert
 - mangle repeat ovw
+- mangle splice insert
 - Todo (Soon)
 
 

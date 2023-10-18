@@ -79,12 +79,33 @@ impl Mutator {
             Self::mangle_del_byte,
             Self::mangle_repeat_insert,
             Self::mangle_repeat_ovw,
+            Self::mangle_splice_insert,
             // TODO
         ];
         for _ in 0..mutations {
             let sel = self.rng.rand(0, algo.len() - 1);
             let choose = algo[sel];
             choose(self);
+        }
+    }
+
+    fn mangle_splice_insert(&mut self) {
+        let donor = self.run.dyn_file.data.clone();
+        let insert_offset = self.rng.rand(0, self.run.dyn_file.data.len());
+
+        // Ensure that donor_offset is within bounds
+        let donor_offset = self.rng.rand(0, donor.len().saturating_sub(1));
+
+        // Ensure that donor_length does not exceed the remaining elements in the donor slice
+        let max_length = donor.len() - donor_offset;
+        let donor_length = self.rng.rand(1, max_length);
+
+        let splice = &donor[donor_offset..(donor_offset + donor_length)];
+
+        if insert_offset <= self.run.dyn_file.data.len() {
+            self.run.dyn_file.data.splice(insert_offset..insert_offset, splice.iter().cloned());
+        } else {
+            self.run.dyn_file.data.extend(splice.iter().cloned());
         }
     }
 
