@@ -9,7 +9,8 @@ fn main() {
         .seed(0xabcdef1234567890)
         .exp_disabled(false);
 
-    for _ in 0..20 {
+    // for _ in 0..20 {
+    loop {
         mutator.mangle_random_insert();
         let original = {
             let dyn_file_data = &mutator.run.dyn_file.data.clone();

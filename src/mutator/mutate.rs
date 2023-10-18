@@ -80,6 +80,7 @@ impl Mutator {
             Self::mangle_repeat_insert,
             Self::mangle_repeat_ovw,
             Self::mangle_splice_insert,
+            Self::mangle_splice_overwrite,
             // TODO
         ];
         for _ in 0..mutations {
@@ -95,7 +96,6 @@ impl Mutator {
 
         // Ensure that donor_offset is within bounds
         let donor_offset = self.rng.rand(0, donor.len().saturating_sub(1));
-
         // Ensure that donor_length does not exceed the remaining elements in the donor slice
         let max_length = donor.len() - donor_offset;
         let donor_length = self.rng.rand(1, max_length);
@@ -108,6 +108,7 @@ impl Mutator {
             self.run.dyn_file.data.extend(splice.iter().cloned());
         }
     }
+
 
     fn mangle_repeat_ovw(&mut self) {
         let mut chn_data = Vec::new();
@@ -123,6 +124,28 @@ impl Mutator {
             }
         }
         self.run.dyn_file.data = chn_data;
+    }
+
+    fn mangle_splice_overwrite(&mut self) {
+        if self.run.dyn_file.data.is_empty() {
+            return;
+        }
+        let donor = self.run.dyn_file.data.clone();
+        let overwrite_offset = self.rng.rand_exp(0,self.run.dyn_file.data.len());
+        let donor_offset = self.rng.rand_exp(0,donor.len());
+        let donor_length = self.rng.rand_exp(1,donor.len() - donor_offset + 1);
+        let splice;
+        if (donor_offset + donor_length) > donor.len() {
+            splice = &donor[donor_offset..donor.len()];
+        } else {
+            splice = &donor[donor_offset..(donor_offset + donor_length)];
+        }
+        let start = overwrite_offset;
+        let end = start + splice.len();
+
+        if end <= self.run.dyn_file.data.len() {
+            self.run.dyn_file.data[start..end].copy_from_slice(splice);
+        }
     }
 
     fn mangle_repeat_insert(&mut self) {
@@ -151,7 +174,6 @@ impl Mutator {
                 self.rng.rand(0, 255) as u8
             }
         }).collect();
-
         self.run.dyn_file.data.splice(insert_index..insert_index, random_bytes);
     }
 
